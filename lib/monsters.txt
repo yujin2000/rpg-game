@@ -1,0 +1,2 @@
+Spiderman,30,10,0
+Batman,20,8,0

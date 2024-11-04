@@ -1,6 +1,12 @@
 class Monster {
-  late String name;
-  late int stamina;
-  late int attak;
-  late int defence;
+  String name;
+  int stamina;
+  int attack;
+  int defense;
+
+  Monster(this.name, this.stamina, this.attack, {this.defense = 0});
+
+  void showStatus() {
+    print('$name - 체력: $stamina, 공격력: $attack, 방어력: $defense');
+  }
 }
