@@ -17,8 +17,8 @@ class Character {
   // 몬스터가 입히는 데미지 만큼 캐릭터의 체력 상성
   void defend(Monster monster) {
     monster.setAttack(defense);
-    int realAttackValue = attack - defense;
-    monster.stamina += realAttackValue;
+    int realAttackValue = monster.attack - defense;
+    stamina += realAttackValue;
     print('$name이(가) 방어 태세를 취하여 $realAttackValue 만큼 체력을 얻었습니다.');
     showStatus();
   }
