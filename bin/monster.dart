@@ -16,7 +16,7 @@ class Monster {
   void attackCharacter(Character character) {
     int charDefense = character.defense;
     setAttack(charDefense);
-    int realAttackValue = charDefense - attack;
+    int realAttackValue = attack - charDefense;
     character.stamina -= realAttackValue;
 
     print('$name이(가) ${character.name}에게 $realAttackValue 만큼 데미지를 입혔습니다.');
@@ -30,6 +30,6 @@ class Monster {
   }
 
   void showStatus() {
-    print('$name - 체력: $stamina, 최대공격력: $maxAttack, 방어력: $defense');
+    print('[몬스터] $name - 체력: $stamina, 최대공격력: $maxAttack, 방어력: $defense');
   }
 }
