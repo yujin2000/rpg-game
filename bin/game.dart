@@ -24,20 +24,10 @@ class Game {
     character.showStatus();
 
     bool finishBattle = false;
-    bool aliveCharacter = true;
 
     // 캐릭터의 체력이 0 이하, finishBattle=true, monsters 의 값이 비어있으면 battle 종료
-    while (aliveCharacter && !finishBattle && monsters.isNotEmpty) {
-      Monster fightMonster = getRandomMonster();
-      print('\n새로운 몬스터가 나타났습니다!');
-      fightMonster.showStatus();
-      aliveCharacter = battle(character, fightMonster);
-
-      // 처치한 몬스터 삭제 및 리스트에 추가
-      if (aliveCharacter) {
-        monsters.remove(fightMonster);
-        deathMonsters.add(fightMonster);
-      }
+    while (isAliveCharacter() && !finishBattle && monsters.isNotEmpty) {
+      battle();
 
       // monsters 가 없으면 추가 배틀 종료
       if (monsters.isEmpty) {
@@ -46,7 +36,7 @@ class Game {
       }
 
       bool exit = false;
-      while (!exit && aliveCharacter) {
+      while (!exit && isAliveCharacter()) {
         stdout.write('\n다음 몬스터와 싸우시겠습니까? (y/N) ');
         var isFight = stdin.readLineSync();
         if (yes(isFight!)) {
@@ -67,55 +57,46 @@ class Game {
     print('게임이 종료되었습니다.');
   }
 
-  // 승리: true 패배: false
-  bool battle(Character character, Monster monster) {
-    // 캐릭터 공격/방어
-    print('\n${character.name}의 턴');
-    bool exit = false;
-    do {
-      stdout.write('행동을 선택하세요. [1] 공격하기 / [2] 방어하기 => ');
-      try {
-        var action = stdin.readLineSync();
-        switch (int.parse(action!)) {
-          case 1: // 공격
-            character.attackMonster(monster);
-            exit = true;
-          case 2: // 방어
-            character.defend(monster);
-            exit = true;
-          default:
-            print('올바르지 않은 숫자입니다.');
+  void battle() {
+    Monster monster = getRandomMonster();
+    print('\n새로운 몬스터가 나타났습니다!');
+    monster.showStatus();
+
+    while (isAliveCharacter()) {
+      print('\n${character.name}의 턴');
+      bool exit = false;
+
+      do {
+        // 캐릭터 공격/방어
+        stdout.write('행동을 선택하세요. [1] 공격하기 / [2] 방어하기 => ');
+        try {
+          var action = stdin.readLineSync();
+          switch (int.parse(action!)) {
+            case 1: // 공격
+              character.attackMonster(monster);
+              exit = true;
+            case 2: // 방어
+              character.defend(monster);
+              exit = true;
+            default:
+              print('올바르지 않은 숫자입니다.');
+          }
+        } catch (e) {
+          print('유효하지 않은 입력 값입니다. ${e.toString()}');
         }
-      } catch (e) {
-        print('유효하지 않은 입력 값입니다. ${e.toString()}');
+      } while (!exit);
+
+      if (!checkPossibleBattle(monster)) {
+        break;
       }
-    } while (!exit);
 
-    if (character.stamina > 0 && monster.stamina <= 0) {
-      // 몬스터 체력이 0 이하면 승리
-      print('<승리> ${character.name}은(는) ${monster.name}을(를) 물리쳤습니다!');
-      return true;
-    } else if (character.stamina <= 0) {
-      // 캐릭터 체력이 0 이하면 패배
-      print('<패배> ${character.name}은(는) ${monster.name}에게 당했습니다!');
-      return false;
-    }
+      // 몬스터 공격
+      print('\n${monster.name}의 턴');
+      monster.attackCharacter(character);
 
-    // 몬스터 공격
-    print('\n${monster.name}의 턴');
-    monster.attackCharacter(character);
-
-    // 캐릭터, 몬스터의 체력이 0 초과면 battle 진행
-    if (character.stamina > 0 && monster.stamina > 0) {
-      return battle(character, monster);
-    } else if (character.stamina > 0 && monster.stamina <= 0) {
-      // 몬스터 체력이 0 이하면 승리
-      print('<승리> ${character.name}은(는) ${monster.name}을(를) 물리쳤습니다!');
-      return true;
-    } else {
-      // 캐릭터 체력이 0 이하면 패배
-      print('<패배> ${character.name}은(는) ${monster.name}에게 당했습니다!');
-      return false;
+      if (!checkPossibleBattle(monster)) {
+        break;
+      }
     }
   }
 
@@ -198,6 +179,32 @@ class Game {
         print('유효하지 않은 입력 값입니다. ${e.toString()}');
       }
     }
+  }
+
+  bool isAliveCharacter() {
+    return character.stamina > 0;
+  }
+
+  // true: 진행 가능 / false: 진행 불가능(캐릭터 승리 or 패배)
+  bool checkPossibleBattle(Monster monster) {
+    // 캐릭터 몬스터 체력이 남아있으면 그대로 진행
+    if (isAliveCharacter() && monster.stamina > 0) {
+      return true;
+    }
+
+    if (isAliveCharacter() && monster.stamina <= 0) {
+      // 몬스터 체력이 0 이하면 승리
+      print('\n<승리> ${character.name}은(는) ${monster.name}을(를) 물리쳤습니다!');
+      // 처치한 몬스터 삭제 및 리스트에 추가
+      monsters.remove(monster);
+      deathMonsters.add(monster);
+      return false;
+    } else if (character.stamina <= 0) {
+      // 캐릭터 체력이 0 이하면 패배
+      print('\n<패배> ${character.name}은(는) ${monster.name}에게 당했습니다!');
+      return false;
+    }
+    return false;
   }
 
   bool yes(String str) {
