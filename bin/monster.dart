@@ -29,6 +29,11 @@ class Monster {
     attack = max(charDefense, Random().nextInt(maxAttack));
   }
 
+  // 방어력 증가
+  void increasedDefense() {
+    defense += 2;
+  }
+
   void showStatus() {
     print('[몬스터] $name - 체력: $stamina, 최대공격력: $maxAttack, 방어력: $defense');
   }

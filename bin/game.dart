@@ -63,6 +63,8 @@ class Game {
     print('\n새로운 몬스터가 나타났습니다!');
     monster.showStatus();
 
+    int turnCount = 0;
+
     while (isAliveCharacter()) {
       print('\n${character.name}의 턴');
       bool exit = false;
@@ -80,12 +82,8 @@ class Game {
               character.defend(monster);
               exit = true;
             case 3: // 특수 아이템 사용 기능
-              if (!character.useItem) {
-                character.useItemAttackMonster(monster);
-                exit = true;
-              } else {
-                throw Exception('아이템을 이미 사용했습니다.');
-              }
+              character.useItemAttackMonster(monster);
+              exit = true;
             default:
               print('올바르지 않은 숫자입니다.');
           }
@@ -106,6 +104,14 @@ class Game {
 
       if (!checkPossibleBattle(monster)) {
         break;
+      }
+
+      turnCount++;
+      // 3번의 턴을 지나면 몬스터의 방어력을 올림
+      if (turnCount == 3) {
+        monster.increasedDefense();
+        print('\n${monster.name}의 방어력이 증가헀습니다! 현재 방어력: ${monster.defense}');
+        turnCount = 0;
       }
     }
   }
