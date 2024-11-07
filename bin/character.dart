@@ -5,11 +5,21 @@ class Character {
   int stamina;
   int attack;
   int defense;
+  bool useItem;
 
-  Character(this.name, this.stamina, this.attack, this.defense);
+  Character(this.name, this.stamina, this.attack, this.defense,
+      {this.useItem = false});
 
+  // 몬스터 공격
   void attackMonster(Monster monster) {
     monster.stamina -= attack;
+    print('$name이(가) ${monster.name}에게 $attack의 데미지를 입혔습니다.');
+  }
+
+  // 아이템 사용하여 몬스터 공격하면 공격력 두 배
+  void useItemAttackMonster(Monster monster) {
+    monster.stamina -= (attack * 2);
+    useItem = true;
     print('$name이(가) ${monster.name}에게 $attack의 데미지를 입혔습니다.');
   }
 

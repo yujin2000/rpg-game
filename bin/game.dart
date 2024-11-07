@@ -21,6 +21,7 @@ class Game {
     await setBeforeBattle();
 
     print('게임을 시작합니다!');
+    bonusStamina();
     character.showStatus();
 
     bool finishBattle = false;
@@ -68,7 +69,7 @@ class Game {
 
       do {
         // 캐릭터 공격/방어
-        stdout.write('행동을 선택하세요. [1] 공격하기 / [2] 방어하기 => ');
+        stdout.write('행동을 선택하세요. [1] 공격하기 / [2] 방어하기 / [3] 아이템 사용 => ');
         try {
           var action = stdin.readLineSync();
           switch (int.parse(action!)) {
@@ -78,11 +79,20 @@ class Game {
             case 2: // 방어
               character.defend(monster);
               exit = true;
+            case 3: // 특수 아이템 사용 기능
+              if (!character.useItem) {
+                character.useItemAttackMonster(monster);
+                exit = true;
+              } else {
+                throw Exception('아이템을 이미 사용했습니다.');
+              }
             default:
               print('올바르지 않은 숫자입니다.');
           }
-        } catch (e) {
+        } on FormatException catch (e) {
           print('유효하지 않은 입력 값입니다. ${e.toString()}');
+        } catch (e) {
+          print(e.toString());
         }
       } while (!exit);
 
@@ -213,5 +223,14 @@ class Game {
 
   bool no(String str) {
     return str == 'n' || str == 'N';
+  }
+
+  // 30% 의 확률로 보너스 체력을 얻는 메서드
+  void bonusStamina() {
+    var value = Random().nextInt(10);
+    if (value < 3) {
+      character.stamina += 10;
+      print('보너스 체력을 얻었습니다! 현재 체력: ${character.stamina}');
+    }
   }
 }
