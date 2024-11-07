@@ -179,10 +179,11 @@ class Game {
           // 결과 저장
           String winLossResult = deathMonsters.isEmpty ? '패배' : '승리';
           String gameResult =
-              '이름: ${character.name} 남은 체력: ${character.stamina} 게임 결과: $winLossResult';
+              '이름: ${character.name} | 남은 체력: ${character.stamina} | 게임 결과: $winLossResult\n';
           print(gameResult);
 
-          File(resultFilePath).writeAsStringSync(gameResult);
+          File(resultFilePath)
+              .writeAsStringSync(gameResult, mode: FileMode.append);
           print('파일에 저장되었습니다.');
           exit = true;
         } else if (no(isSave)) {
